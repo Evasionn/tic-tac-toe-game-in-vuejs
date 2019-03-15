@@ -30,6 +30,7 @@
           {{ winner }}
         </p>
        </div>
+       <button class="button-restart" v-if="countEmptyCells() !== 9" v-on:click="reset">RESTART</button>
     </div>
   </div>
 </template>
@@ -63,6 +64,23 @@ export default {
 
       return false;
     },
+    countEmptyCells: function countEmptyCells(){
+      // checking all fields is full
+      let emptyCount = 0;
+      for (let i = 0; i < 3; i++){
+        for (let j = 0; j < 3; j++){
+          if (!this.game[i][j]){
+            emptyCount++;
+          }
+        }
+      }
+
+      return emptyCount;
+    },
+    reset: function reset(){
+      this.game = [[], [], []];
+      this.winner = '';
+    },
     computerMove: function computerMove(){
       for (;;){
         const randomX = Math.floor(Math.random() * 3);
@@ -79,19 +97,9 @@ export default {
       }
       this.game[x][y] = 'X';
 
-      // checking all fields is full
-      let emptyCount = 0;
-      for (let i = 0; i < 3; i++){
-        for (let j = 0; j < 3; j++){
-          if (!this.game[i][j]){
-            emptyCount++;
-          }
-        }
-      }
-
       if (this.isDone()) {
         this.winner = 'X Winner!';
-      } else if (emptyCount === 0){
+      } else if (this.countEmptyCells() === 0){
         this.winner = 'XO Draw!';
       } else{
         this.computerMove();
@@ -151,5 +159,12 @@ a {
   height: 60px;
   line-height: 60px;
   text-align: center;
+}
+.button-restart {
+  border: none;
+  background-color: #7899d4;
+  padding: 10px;
+  margin-top: 20px;
+  color: #2c3e50;
 }
 </style>
