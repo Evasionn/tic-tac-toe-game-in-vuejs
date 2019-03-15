@@ -5,22 +5,12 @@
     </div>
     <div class="game-board">
       <table>
-        <tr class="first-row">
-          <td class="first-cell" v-on:click="click(0, 0)">
-            {{ game[0][0] }}
+        <tr v-for="(row, rowIndex) in game" :key="rowIndex">
+          <td v-for="(column, columnIndex) in row" :key="columnIndex" v-on:click="click(rowIndex, columnIndex)">
+            <transition name="fade">
+              <span v-if="game[rowIndex][columnIndex]"> {{ game[rowIndex][columnIndex] }} </span>
+            </transition>
           </td>
-          <td class="second-cell"  v-on:click="click(0, 1)">{{ game[0][1] }}</td>
-          <td  v-on:click="click(0, 2)">{{ game[0][2] }}</td>
-        </tr>
-        <tr class="second-row">
-          <td class="first-cell"  v-on:click="click(1, 0)">{{ game[1][0] }}</td>
-          <td class="second-cell"  v-on:click="click(1, 1)">{{ game[1][1] }}</td>
-          <td  v-on:click="click(1, 2)">{{ game[1][2] }}</td>
-        </tr>
-        <tr class="third-row">
-          <td class="first-cell"  v-on:click="click(2, 0)">{{ game[2][0] }}</td>
-          <td class="second-cell"  v-on:click="click(2, 1)">{{ game[2][1] }}</td>
-          <td  v-on:click="click(2, 2)">{{ game[2][2] }}</td>
         </tr>
       </table>
        <div v-if="winner">
@@ -78,8 +68,9 @@ export default {
       return emptyCount;
     },
     reset: function reset(){
-      this.game = [[], [], []];
+      this.game = [['', '', ''], ['', '', ''], ['', '', '']];
       this.winner = '';
+      this.turn = 'X';
     },
     computerMove: function computerMove(){
       for (;;){
@@ -92,31 +83,38 @@ export default {
       }
     },
     click: function click(x, y) {
-      if(this.winner || this.game[x][y]){
+      if(this.winner || this.game[x][y] || this.turn === 'O'){
         return;
       }
+
       this.game[x][y] = 'X';
+      this.turn = 'O';
 
       if (this.isDone()) {
         this.winner = 'X Winner!';
       } else if (this.countEmptyCells() === 0){
         this.winner = 'XO Draw!';
       } else{
-        this.computerMove();
-        if (this.isDone()) {
-          this.winner = 'O Winner!';
-        }
+        setTimeout(() => {
+          this.computerMove();
+          if (this.isDone()) {
+            this.winner = 'O Winner!';
+          }
+          this.turn = 'X';
+          this.$forceUpdate();
+        }, 500);
       }
       this.$forceUpdate();
     }
   },
   data() {
     return {
+      turn: 'X',
       winner: '',
       game: [
-        [],
-        [],
-        [],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
       ]
     }
   }
@@ -143,14 +141,12 @@ a {
   margin: 0 auto;
   border-collapse: collapse;
 }
-.game-board table .first-row td {
+.game-board tr:first-child,
+.game-board tr:nth-child(2) {
   border-bottom: 1px solid #ccc;
 }
-.game-board table .second-row td{
-  border-bottom: 1px solid #ccc;
-}
-.game-board table tr .first-cell,
-.game-board table tr .second-cell {
+.game-board tr td:first-child,
+.game-board tr td:nth-child(2) {
   border-right: 1px solid #ccc;
 }
 .game-board td {
@@ -166,5 +162,11 @@ a {
   padding: 10px;
   margin-top: 20px;
   color: #2c3e50;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
