@@ -1,4 +1,9 @@
-# tic-tac-toe
+# Tic-Tac-Toe Game with using Vue.js
+
+![](screenshot.png)
+
+## Live Demo
+[Live demo](http://melihsahakin.com/games/tic-tac-toe/)
 
 ## Project setup
 ```
